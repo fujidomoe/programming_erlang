@@ -10,7 +10,8 @@
 -module(lib_misc).
 -author("sakura1116").
 
--export([sum/1, sum/2, for/3, qsort/1, pythang/1, perms/1, odds_and_evens/1, odds_and_evens_acc/1, odds_and_evens_acc/3, sqrt/1]).
+%%-export([sum/1, sum/2, for/3, qsort/1, pythang/1, perms/1, odds_and_evens/1, odds_and_evens_acc/1, odds_and_evens_acc/3, sqrt/1]).
+-compile(export_all).
 
 sum(L) ->
   sum(L,0).
@@ -89,3 +90,35 @@ sqrt(X) when X < 0 ->
 sqrt(X) ->
   math:sqrt(X).
 
+
+%% タイムアウトだけを指定した受信
+%% この関数は現在のプロセスをTミリ秒間中断する
+sleep(T) ->
+  receive
+    after T ->
+    true
+  end.
+
+%% タイムアウト値が0の受信(P119)
+%% タイムアウト値に0を指定するとタイムアウト説の内容が即座に実行されるが、その前に、システムはメールボックスの内容に対してパターン照合を試みる
+%% この機能を使えば、プロセスのメールボックスのメッセージを全て吐き出して空にするflush_buffer関数を定義できる
+flush_buffer() ->
+  receive
+    _Any ->
+      flush_buffer()
+  after 0 ->
+    true
+  end.
+
+%% タイムアウト値に0を指定することによって、次のように一種の"優先順位付受信"を実現できる
+
+priority_receive() ->
+  receive
+    {alarm, X} ->
+      {alarm, X}
+  after 0 ->
+    receive
+      Any ->
+        Any
+    end
+  end.
