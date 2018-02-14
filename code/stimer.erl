@@ -20,8 +20,9 @@ timer(Time, Fun) ->
     Fun()
   end.
 
-%% 5秒後に発火するよ
-%% Pid = stimer:start(5000, fun() -> io:format("timer event~n") end).
+%% N秒後に発火するよ
+%% Pid = stimer:start(8000, fun() -> io:format("timer event~n") end).
+%% Pid1 = stimer:start(4000, fun() -> io:format("timer event!!~n") end).
 %% 上記を叩いた後に5秒以内に下記を叩くとcancelできるよ!
 %% stimer:cancel(Pid).
 
