@@ -122,3 +122,26 @@ priority_receive() ->
         Any
     end
   end.
+
+
+%% プロセスは終了シグナルを補足するように設定することもできる。そのように設定したプロセスはシステムプロセスと呼ばれす(第9章 P127)
+on_exit(Pid, Fun) ->
+  spawn(fun() ->
+    process_flag(trap_exit, true),
+    link(Pid),
+    receive
+      {'EXIT', Pid, Why} ->
+        Fun(Why)
+    end
+  end).
+
+%% F = fun() -> receive X -> list_to_atom(X) end end.
+%% Pid = spawn(F).
+%% lib_misc:on_exit(Pid, fun(Why) -> io:format("~p died whith:~p~n", [Pid, Why]) end).
+
+
+%% キープアライブプロセス 常に生きている登録済のプロセスで、このプロセスは何らかの要因で死んでも即座に再起動する。
+
+keep_alive(Name, Fun) ->
+  register(Name, Pid = spawn(Fun)),
+  on_exit(Pid, fun(_Why) -> keep_alive(Name, Fun) end).
